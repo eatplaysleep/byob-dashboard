@@ -36,7 +36,6 @@ provider:
 functions:
   oktaAuth:
     handler: authorizer/handler.auth
-    cors: true
 
   proxy:
     handler: proxy/okta.handler
