@@ -4,7 +4,7 @@
 
 # Local variables
 locals {
-  app_name = "byob-dashboard"
+  app_name = var.environment != "production" ? "${var.app_name}-${var.environment}" : var.app_name
 }
 
 # Required providers
@@ -14,7 +14,7 @@ terraform {
       source  = "oktadeveloper/okta"
       version = "3.10.1"
     }
-  }  
+  }
 }
 
 # Setup Okta Tenant
@@ -24,7 +24,7 @@ provider "okta" {
   base_url  = var.base_url
 }
 
-# BYOB Users - Everyone 
+# BYOB Users - Everyone
 data "okta_group" "byob-users" {
   name = "Everyone"
 }
@@ -38,7 +38,7 @@ resource "okta_app_oauth" "okta-byob" {
   grant_types                = ["authorization_code"]
   response_types             = ["code"]
   token_endpoint_auth_method = "none"
-  issuer_mode                = "ORG_URL"
+  issuer_mode                = "DYNAMIC"
   consent_method             = "TRUSTED"
 }
 
@@ -50,7 +50,7 @@ resource "okta_app_group_assignment" "okta-byob" {
 
 # Create Trusted Origin for the APP
 resource "okta_trusted_origin" "okta-byob" {
-  name   = "BYOB Dashboard"
+  name   = var.app_url
   origin = var.app_url
   scopes = ["CORS", "REDIRECT"]
 }
@@ -59,6 +59,7 @@ resource "okta_trusted_origin" "okta-byob" {
 resource "okta_auth_server" "okta-byob" {
   audiences   = ["api://${local.app_name}"]
   description = "Okta BYOB Authorization Server"
+  issuer_mode = "DYNAMIC"
   name        = local.app_name
 }
 
@@ -111,7 +112,7 @@ resource "okta_auth_server_policy_rule" "okta-byob" {
   access_token_lifetime_minutes = 60
 }
 
-# Deprecate. email template is not supported by Provider oktadeveloper/okta 
+# Deprecate. email template is not supported by Provider oktadeveloper/okta
 # Change the welcome email template
 // resource "okta_template_email" "email-welcome" {
 //   type = "email.welcome"
@@ -135,4 +136,3 @@ output "okta_auth_server_id" {
 output "okta_auth_server_issuer_uri" {
   value = "https://${var.org_name}.${var.base_url}/oauth2/${okta_auth_server.okta-byob.id}"
 }
-

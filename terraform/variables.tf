@@ -9,7 +9,12 @@ variable "base_url" {
   default = "okta.com" #"oktapreview.com" if using non-prod.
 }
 
+variable "app_name" {
+  default = "byob-dashboard"
+}
+
 variable "app_url" {
+  default = "http://localhost:8081"
 }
 
 variable "environment" {
@@ -29,4 +34,3 @@ variable "aws_ssm_prefix" {
 
 # variable "recaptcha_site_secret" {
 # }
-
