@@ -1,7 +1,7 @@
 provider "aws" {
-  region                  = var.aws_region
+  region                   = var.aws_region
   shared_credentials_files = ["~/.aws/credentials"]
-  profile                 = var.aws_profile
+  profile                  = var.aws_profile
 }
 
 resource "aws_ssm_parameter" "okta-client-id" {
