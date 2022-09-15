@@ -1,10 +1,10 @@
 service: okta-byob-api
 
-frameworkVersion: ">=1.1.0"
+frameworkVersion: '>=1.1.0'
 
 #plugins:
-  # - serverless-offline-ssm
-  # - serverless-offline
+# - serverless-offline-ssm
+# - serverless-offline
 
 custom:
   env: ${file(./.env.json)}
@@ -14,8 +14,8 @@ provider:
   name: aws
   runtime: nodejs12.x
   profile: ${self:custom.env.AWS_PROFILE} # This should match what's in /terraform/terraform.tfvars
-  region: ${self:custom.env.AWS_REGION}   # This should match what's in /terraform/terraform.tfvars
-  stage: ${self:custom.env.ENVIRONMENT}   # This should match what's in /terraform/terraform.tfvars
+  region: ${self:custom.env.AWS_REGION} # This should match what's in /terraform/terraform.tfvars
+  stage: ${self:custom.env.ENVIRONMENT} # This should match what's in /terraform/terraform.tfvars
   environment:
     # Set the SSM Parameter directly as an environment variable
     ISSUER: ${ssm:/${self:custom.ssmPrefix}/okta/${self:provider.stage}/issuer-uri}
@@ -23,7 +23,7 @@ provider:
     OKTA_CLIENT_ID: ${ssm:/${self:custom.ssmPrefix}/okta/${self:provider.stage}/client-id}
 
     #To-Do: Set SecureString parameter name in environment variable, not the actual value.
-    OKTA_API_KEY: ${ssm:/${self:custom.ssmPrefix}/okta/${self:provider.stage}/api-token~true}
+    OKTA_API_KEY: ${ssm:/${self:custom.ssmPrefix}/okta/${self:provider.stage}/api-token}
 
   # To-Do: IAM Policy to Read SSM Parameters
   # iamRoleStatementsInherit: true
@@ -52,10 +52,10 @@ functions:
 resources:
   Outputs:
     ApiUrl:
-      Description: "The API Gateway URL"
+      Description: 'The API Gateway URL'
       Value:
         Fn::Join:
-          - ""
-          - - "https://"
+          - ''
+          - - 'https://'
             - Ref: ApiGatewayRestApi
-            - ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}"
+            - '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}'

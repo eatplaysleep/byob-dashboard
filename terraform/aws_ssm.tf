@@ -1,6 +1,6 @@
 provider "aws" {
   region                  = var.aws_region
-  shared_credentials_file = "~/.aws/credentials"
+  shared_credentials_files = ["~/.aws/credentials"]
   profile                 = var.aws_profile
 }
 
@@ -57,5 +57,3 @@ resource "aws_ssm_parameter" "okta-api-token" {
 #    environment = var.environment
 #  }
 #}
-
-
