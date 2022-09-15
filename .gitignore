@@ -29,3 +29,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# other
+package-lock.json
+terraform/.terraform.lock.hcl
