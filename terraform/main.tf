@@ -4,24 +4,18 @@
 
 # Local variables
 locals {
-  app_name = var.environment != "production" ? "${var.app_name}-${var.environment}" : var.app_name
-}
+  app_name = var.environment != "prod" ? "${var.app_name}-${var.environment}" : var.app_name
 
-# Required providers
-terraform {
-  required_providers {
-    okta = {
-      source  = "oktadeveloper/okta"
-      version = "3.10.1"
-    }
-  }
+  dac_app_name = var.environment != "prod" ? "${var.dac_app_name}-${var.environment}" : var.dac_app_name
+
+  base_url = try(var.base_url, var.environment != "prod" ? "oktapreview.com" : "okta.com")
 }
 
 # Setup Okta Tenant
 provider "okta" {
   org_name  = var.org_name
   api_token = var.api_token
-  base_url  = var.base_url
+  base_url  = local.base_url
 }
 
 # BYOB Users - Everyone
@@ -40,6 +34,10 @@ resource "okta_app_oauth" "okta-byob" {
   token_endpoint_auth_method = "none"
   issuer_mode                = "DYNAMIC"
   consent_method             = "TRUSTED"
+  pkce_required = true
+  lifecycle {
+    ignore_changes = [groups, users]
+  }
 }
 
 # Create the App Assignment
@@ -55,14 +53,6 @@ resource "okta_trusted_origin" "okta-byob" {
   scopes = ["CORS", "REDIRECT"]
 }
 
-# Create Custom Authorization Server
-resource "okta_auth_server" "okta-byob" {
-  audiences   = ["api://${local.app_name}"]
-  description = "Okta BYOB Authorization Server"
-  issuer_mode = "DYNAMIC"
-  name        = local.app_name
-}
-
 ## Create scope in custom authorization server
 # resource "okta_auth_server_scope" "okta-byob" {
 #   auth_server_id   = okta_auth_server.okta-byob.id
@@ -72,17 +62,8 @@ resource "okta_auth_server" "okta-byob" {
 #   consent          = "IMPLICIT"
 # }
 
-resource "okta_auth_server_claim" "okta-byob-groups-id" {
-  auth_server_id    = okta_auth_server.okta-byob.id
-  name              = "groups"
-  value             = ".*"
-  value_type        = "GROUPS"
-  group_filter_type = "REGEX"
-  claim_type        = "IDENTITY"
-}
-
 resource "okta_auth_server_claim" "okta-byob-mobile-phone" {
-  auth_server_id = okta_auth_server.okta-byob.id
+  auth_server_id = data.okta_auth_server.okta-dac.id
   name           = "MobilePhone"
   value          = "user.mobilePhone"
   value_type     = "EXPRESSION"
@@ -91,7 +72,7 @@ resource "okta_auth_server_claim" "okta-byob-mobile-phone" {
 
 # Create policy in custom authorization server
 resource "okta_auth_server_policy" "okta-byob" {
-  auth_server_id   = okta_auth_server.okta-byob.id
+  auth_server_id   = data.okta_auth_server.okta-dac.id
   status           = "ACTIVE"
   name             = "okta-byob"
   description      = "okta-byob policy"
@@ -101,7 +82,7 @@ resource "okta_auth_server_policy" "okta-byob" {
 
 # Create policy rule in custom authorization server
 resource "okta_auth_server_policy_rule" "okta-byob" {
-  auth_server_id                = okta_auth_server.okta-byob.id
+  auth_server_id                = data.okta_auth_server.okta-dac.id
   policy_id                     = okta_auth_server_policy.okta-byob.id
   status                        = "ACTIVE"
   name                          = "okta byob rule"
@@ -130,9 +111,9 @@ output "okta_app_oauth_client_id" {
 }
 
 output "okta_auth_server_id" {
-  value = okta_auth_server.okta-byob.id
+  value = data.okta_auth_server.okta-dac.id
 }
 
 output "okta_auth_server_issuer_uri" {
-  value = "https://${var.org_name}.${var.base_url}/oauth2/${okta_auth_server.okta-byob.id}"
+  value = data.okta_auth_server.okta-dac.issuer
 }

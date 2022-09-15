@@ -19,7 +19,7 @@ resource "aws_ssm_parameter" "okta-issuer-uri" {
   name        = "/${var.aws_ssm_prefix}/okta/${var.environment}/issuer-uri"
   description = "Okta Issuer URI"
   type        = "String"
-  value       = "https://${var.org_name}.${var.base_url}/oauth2/${okta_auth_server.okta-byob.id}"
+  value       = data.okta_auth_server.okta-dac.issuer
 
   tags = {
     environment = var.environment
