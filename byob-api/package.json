@@ -9,7 +9,7 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"@okta/jwt-verifier": "^1.0.0",
+		"@okta/jwt-verifier": "^2.0.0",
 		"aws-auth-policy": "^0.1.0",
 		"axios": "^0.21.1"
 	},
