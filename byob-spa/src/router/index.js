@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import OktaVue from '@okta/okta-vue';
+import OktaVue, { LoginCallback } from '@okta/okta-vue';
 import { OktaAuth } from '@okta/okta-auth-js';
 import Home from '@/views/Home.vue';
 import Settings from '@/views/Settings.vue';
@@ -8,6 +8,7 @@ import Activate from '@/components/Activate';
 import config from '@/.config';
 
 Vue.use(Router);
+console.log(process.env.BASE_URL);
 
 const router = new Router({
 	mode: 'history',
@@ -24,7 +25,7 @@ const router = new Router({
 		},
 		{
 			path: '/oauth/callback',
-			component: OktaVue.handleCallback(),
+			component: LoginCallback,
 		},
 		{
 			path: '/settings',
@@ -50,7 +51,7 @@ const router = new Router({
 config.oidc.redirect_uri = window.location.protocol + '//' + window.location.host + config.oidc.redirect_uri;
 
 const { client_id: clientId, redirect_uri: redirectUri, ...oidcConfig } = config.oidc;
-
+console.log(config.oidc);
 const oktaAuth = new OktaAuth({
 	clientId,
 	redirectUri,
