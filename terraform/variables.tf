@@ -12,32 +12,32 @@ variable "base_url" {
 }
 
 variable "app_name" {
-  type = string
+  type    = string
   default = "byob-dashboard"
 }
 
 variable "dac_app_name" {
-  type = string
+  type    = string
   default = "okta-dac"
 }
 
 variable "dac_app_url" {
-  type = string
+  type    = string
   default = "http://localhost:8080"
 }
 
 variable "app_url" {
-  type = string
+  type    = string
   default = "http://localhost:8081"
 }
 
 variable "environment" {
-  type = string
+  type    = string
   default = "dev"
 }
 
 variable "aws_region" {
-  type = string
+  type    = string
   default = "us-east-2"
 }
 
@@ -45,7 +45,7 @@ variable "aws_profile" {
 }
 
 variable "aws_ssm_prefix" {
-  type = string
+  type    = string
   default = "byob"
 }
 

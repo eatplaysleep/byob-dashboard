@@ -34,7 +34,7 @@ resource "okta_app_oauth" "okta-byob" {
   token_endpoint_auth_method = "none"
   issuer_mode                = "DYNAMIC"
   consent_method             = "TRUSTED"
-  pkce_required = true
+  pkce_required              = true
   lifecycle {
     ignore_changes = [groups, users]
   }
